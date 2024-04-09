@@ -14,6 +14,7 @@ class PinMail extends Mailable
     use Queueable, SerializesModels;
 
     public $pin;
+    public $logoUrl;
 
     /**
      * Create a new message instance.
@@ -23,6 +24,7 @@ class PinMail extends Mailable
     public function __construct($pin)
     {
         $this->pin = $pin;
+        $this->logoUrl = asset('images/bslogo.png');
     }
 
     /**

@@ -19,11 +19,22 @@ class UserController extends Controller
         $validatedData = $request->validate([
             'firstname' => 'required|string',
             'lastname' => 'required|string',
-            'employment_number' => 'required|string',
-            'user_type_id' => 'required|string', // Should match the name attribute of the select field
+            'employment_number' => 'nullable|string',
+            'user_type_id' => 'required|string',
             'status' => 'required|string',
-            'email' => 'required|email',
+            'email' => 'nullable|email',
+            'department' =>  'nullable|string',
         ]);
+
+        // Check if employment number already exists
+        if ($validatedData['employment_number'] !== null && CustomUser::where('bsl_cmn_users_employment_number', $validatedData['employment_number'])->exists()) {
+            return redirect()->back()->with('error', 'Employment number already exists.');
+        }
+
+        // Check if email already exists
+        if ($validatedData['email'] && CustomUser::where('bsl_cmn_users_email', $validatedData['email'])->exists()) {
+            return redirect()->back()->with('error', 'Email already exists.');
+        }
 
         // Generate a random 4-digit PIN
         $pin = mt_rand(1000, 9999);
@@ -37,16 +48,28 @@ class UserController extends Controller
         $user->bsl_cmn_users_type = $validatedData['user_type_id'];
         $user->bsl_cmn_users_status = $validatedData['status'];
         $user->bsl_cmn_users_email = $validatedData['email'];
+        $user->bsl_cmn_users_department = $validatedData['department'];
 
-        // Save the user to the database
-        $user->save();
+        try {
+            // Save the user to the database
+            $user->save();
 
-        // Send email with PIN
-        Mail::to($validatedData['email'])->send(new PinMail($pin));
+            // Send email with PIN if email is provided
+            if ($validatedData['email']) {
+                Mail::to($validatedData['email'])->send(new PinMail($pin));
+            }
 
-        // Redirect back with success message
-        return redirect()->route('login')->with('success', 'User created successfully.');
+            // Redirect back with success message
+            return redirect()->route('login')->with('success', 'User created successfully.');
+        } catch (\Exception $e) {
+            // Log the error for debugging
+            logger()->error('Error creating user: ' . $e->getMessage());
+
+            // Redirect back with error message
+            return redirect()->back()->with('error', 'Failed to create user. Please try again.');
+        }
     }
+
 
     public function login(Request $request)
     {

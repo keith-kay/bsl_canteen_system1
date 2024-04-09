@@ -21,6 +21,7 @@ class CustomUser extends Model implements Authenticatable
         'bsl_cmn_users_type',
         'bsl_cmn_users_status',
         'bsl_cmn_users_email',
+        'bsl_cmn_users_deparment',
     ];
 
     // Implementing required methods for Authenticatable contract

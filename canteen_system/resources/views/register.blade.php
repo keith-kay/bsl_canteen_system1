@@ -6,6 +6,9 @@
 <div class="container">
     <div class="formContainer text-center">
         <form class="signupForm" action="{{ route('register-user') }}" method="POST">
+            @if(session('error'))
+            <div class="alert alert-danger">{{ session('error') }}</div>
+            @endif
             @csrf
 
             <div class="form-group">
@@ -25,18 +28,23 @@
 
                 <div class="mb-2">
                     <label for="email" class="form-label">Employment Number</label>
-                    <input type="text" required class="form-control" id="empno" name="employment_number" placeholder="Enter employment_number" value="{{ old('email') }}">
+                    <input type="text" class="form-control" id="empno" name="employment_number" placeholder="Enter employment_number" value="{{ old('email') }}">
+                </div>
+
+                <div class="mb-2">
+                    <label for="email" class="form-label">Department</label>
+                    <input type="text" class="form-control" name="department" placeholder="eg ICT">
                 </div>
 
                 <div class="mb-2">
                     <label for="email" class="form-label">Email</label>
-                    <input type="email" required class="form-control" id="empno" name="email" placeholder="email@bulkstream.com">
+                    <input type="email" class="form-control" id="empno" name="email" placeholder="email@bulkstream.com">
                 </div>
 
                 <div class="mb-2">
-                    <label for="user_type_id" class="form-label">User Type</label>
+                    <label for="user_type_id" class="form-label">Company</label>
                     <select class="form-select" id="user_type_id" name="user_type_id" required>
-                        <option value="">Select User Type</option>
+                        <option value="">Select Company</option>
                         @foreach ($userTypes as $userTypeId => $userTypeName)
                         <option value="{{ $userTypeId }}">{{ $userTypeName }}</option>
                         @endforeach

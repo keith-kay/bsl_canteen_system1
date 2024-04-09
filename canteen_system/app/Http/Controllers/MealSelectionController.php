@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use App\Models\Logs;
 use Illuminate\Support\Facades\Auth;
 use App\Models\MealType;
+use App\Models\User_type;
 use App\Models\User;
 
 
@@ -53,7 +54,7 @@ class MealSelectionController extends Controller
             ->exists();
 
 
-        // If a previous entry exists within the specified time frame, prevent the user from making a new entry
+        //If a previous entry exists within the specified time frame, prevent the user from making a new entry
         if ($lastEntry) {
             return redirect('/dashboard')->with('error', 'You have already made a meal selection in your shift. Please try again later.');
         }
@@ -81,6 +82,11 @@ class MealSelectionController extends Controller
         // Fetch the related meal type details
         $mealType = MealType::find($validatedData['meal_type_id']);
 
+        //Fetch the usertype
+        $userTypeId = $user->bsl_cmn_users_type;
+
+        $userType = User_type::find($userTypeId)->bsl_cmn_user_types_name;
+
 
         // Format the log time in the Nairobi timezone
         $logTime = Carbon::parse($latestLog->bsl_cmn_logs_time)->timezone('Africa/Nairobi')->format('d/m/Y H:i:s');
@@ -91,6 +97,8 @@ class MealSelectionController extends Controller
             'userid' => $user->bsl_cmn_users_id,
             'userdetails' => $user->bsl_cmn_users_firstname . ' ' . $user->bsl_cmn_users_lastname,
             'staffid' => $user->bsl_cmn_users_employment_number,
+            'department' => $user->bsl_cmn_users_department,
+            'company' => $userType,
             'mealtype' => $mealType->bsl_cmn_mealtypes_mealname,
             'date' => $logTime,
         ];
@@ -120,12 +128,11 @@ class MealSelectionController extends Controller
         $response = curl_exec($curl);
         if ($response === false) {
             echo "Error: Failed to connect to API.";
+        } else {
+            echo $response;
+            echo $url;
+            echo json_encode($data);
         }
-        // else {
-        //     echo $response;
-        //     echo $url;
-        //     echo json_encode($data);
-        // }
 
 
         curl_close($curl);

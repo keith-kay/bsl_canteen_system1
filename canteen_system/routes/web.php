@@ -16,6 +16,7 @@ Route::post('/selectMeal', [MealSelectionController::class, 'selectMeal'])
     ->name("select-meal");
 Route::get('/logout', [UserController::class, 'logout'])
     ->name('logout');
+Route::post('/logout', [UserController::class, 'logout'])->name('logout');
 
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware('auth')
